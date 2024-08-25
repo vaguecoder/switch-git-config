@@ -1,0 +1,6 @@
+# Skip all config files but sample
+/*.gitconfig.env
+!/sample.gitconfig.env
+
+# Old files directory
+/old/
