@@ -29,9 +29,9 @@ function prepend_filename() {
 
 function switch_gitconfig() {
     # Variables
-    local SETUP_GITCONFIG_SCRIPT_PATH="${HOME}/Workspace/git/setup-gitconfig.sh"
+    local SETUP_GITCONFIG_SCRIPT_PATH="${PWD}/setup-gitconfig.sh"
     local SETUP_GITCONFIG_SCRIPT_PATH_SHORT=$(basename ${SETUP_GITCONFIG_SCRIPT_PATH})
-    local ALL_GITCONFIGS=($(ls $PWD/*.gitconfig.env | grep -v 'sample.gitconfig.env'))
+    local ALL_GITCONFIGS=($(ls ${PWD}/*.gitconfig.env | grep -v 'sample.gitconfig.env'))
     local CURRENT_GITCONFIG=$(git config --global user.configname)
     local NEXT_GITCONFIG=
 
