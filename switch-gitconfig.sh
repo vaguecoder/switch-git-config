@@ -22,11 +22,6 @@
 #             - more than one git config file names, script defaults to the first among the matches.
 #             - none of the git config file names, script falls back to the first among all git configs.
 
-function prepend_filename() {
-    local FILE_NAME_SHORT=$(basename $0)
-    echo "[*${FILE_NAME_SHORT}] $@"
-}
-
 function switch_gitconfig() {
     # Variables
     local SETUP_GITCONFIG_SCRIPT_PATH="${PWD}/setup-gitconfig.sh"
@@ -39,15 +34,15 @@ function switch_gitconfig() {
     if [ ! -z ${PATTERN} ]; then
         local MATCHED_GITCONFIGS=($(printf -- '%s\n' ${ALL_GITCONFIGS[@]} | grep "$PATTERN"))
         if [ ${#MATCHED_GITCONFIGS[@]} -eq 0 ]; then
-            echo "Pattern \"${PATTERN}\" didn't match any git configs from ${ALL_GITCONFIGS[@]}"
-            echo "Falling back to ${ALL_GITCONFIGS[0]}"
+            print_blue "Pattern \"${PATTERN}\" didn't match any git configs from ${ALL_GITCONFIGS[@]}"
+            print_yellow "Falling back to ${ALL_GITCONFIGS[0]}"
             NEXT_GITCONFIG=${ALL_GITCONFIGS[0]}
         elif [ ${#MATCHED_GITCONFIGS[@]} -eq 1 ]; then
-            echo "Pattern \"${PATTERN}\" matched ${MATCHED_GITCONFIGS[0]}"
+            print_blue "Pattern \"${PATTERN}\" matched ${MATCHED_GITCONFIGS[0]}"
             NEXT_GITCONFIG=${MATCHED_GITCONFIGS[0]}
         else
-            echo "Pattern \"${PATTERN}\" matched all these git configs: ${MATCHED_GITCONFIGS[@]}"
-            echo "Defaulting to ${MATCHED_GITCONFIGS[0]}"
+            print_blue "Pattern \"${PATTERN}\" matched all these git configs: ${MATCHED_GITCONFIGS[@]}"
+            print_yellow "Defaulting to ${MATCHED_GITCONFIGS[0]}"
             NEXT_GITCONFIG=${MATCHED_GITCONFIGS[0]}
         fi
     fi
@@ -86,21 +81,22 @@ function switch_gitconfig() {
             done
         fi
     fi
-    prepend_filename "Current Git Config: ${CURRENT_GITCONFIG}" | sed -e "s|${HOME}|~|g"
-    prepend_filename "Next Git Config: ${NEXT_GITCONFIG}" | sed -e "s|${HOME}|~|g"
+    print_blue "Current Git Config: ${CURRENT_GITCONFIG}" | sed -e "s|${HOME}|~|g"
+    print_blue "Next Git Config: ${NEXT_GITCONFIG}" | sed -e "s|${HOME}|~|g"
 
     # Switch to Next Git Config
     if [ "${CURRENT_GITCONFIG}" == "${NEXT_GITCONFIG}" ]; then
-        prepend_filename "Git already on ${NEXT_GITCONFIG}. Overwriting for updates in config."
+        print_blue "Git already on ${NEXT_GITCONFIG}. Overwriting for updates in config."
     fi
-    CONFIG_FILE=${NEXT_GITCONFIG} bash ${SETUP_GITCONFIG_SCRIPT_PATH} 2>&1 | sed "s|^| ↳ [${SETUP_GITCONFIG_SCRIPT_PATH_SHORT}] |g"
-    prepend_filename "Switched to Git Config: ${NEXT_GITCONFIG}" | sed -e "s|${HOME}|~|g"
+    CONFIG_FILE=${NEXT_GITCONFIG} bash ${SETUP_GITCONFIG_SCRIPT_PATH}
+    print_blue "Switched to Git Config: ${NEXT_GITCONFIG}" | sed -e "s|${HOME}|~|g"
 }
 
 # Set shell options
 set -e
 
 # Main flow
+source common.sh
 PATTERN=$1 switch_gitconfig
 
 # Unset shell options
