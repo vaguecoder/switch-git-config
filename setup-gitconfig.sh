@@ -1,32 +1,20 @@
 #!/usr/bin/env bash
 
-function yellow() {
-    echo -e "\033[1;33m$@\033[0m"
-}
-
-function red() {
-    echo -e "\033[1;31m$@\033[0m"
-}
-
-function blue() {
-    echo -e "\033[1;34m$@\033[0m"
-}
-
 function load_configs() {
     if [ -z "${CONFIG_FILE}" ]; then
-        red "Missing config file name env: CONFIG_FILE"
+        print_red "Missing config file name env: CONFIG_FILE"
         
         return 1
     fi
 
     if [ ! -e "${CONFIG_FILE}" ]; then
-        red "Missing config file: ${CONFIG_FILE}"
+        print_red "Missing config file: ${CONFIG_FILE}"
         
         return 1
     fi
 
     source ${CONFIG_FILE}
-    blue "Loaded config file successfully: \"${CONFIG_FILE}\""
+    print_blue "Loaded config file successfully: \"${CONFIG_FILE}\""
 }
 
 function check_variables() {
@@ -49,12 +37,12 @@ function check_variables() {
     done
 
     if [ ${#MISSING_ENVS[@]} -ne 0 ]; then
-        red "Missing mandatory envs: $(sed 's/ /, /g' <<<${MISSING_ENVS[@]})"
+        print_red "Missing mandatory envs: $(sed 's/ /, /g' <<<${MISSING_ENVS[@]})"
 
         return 1
     fi
 
-    blue "Checked input variables successfully: $(sed 's/ /, /g' <<<${REQUIRED_ENVS[@]})"
+    print_blue "Checked input variables successfully: $(sed 's/ /, /g' <<<${REQUIRED_ENVS[@]})"
 }
 
 function clean_up() {
@@ -70,7 +58,7 @@ function clean_up() {
     # Hack-around to make gpg create the required files: pubring.kbx, trustdb.gpg
     gpg --list-keys 2>/dev/null
 
-    blue "Cleaned-up git, ssh, gpg files successfully"
+    print_blue "Cleaned-up git, ssh, gpg files successfully"
 }
 
 function setup_ssh() {
@@ -78,7 +66,7 @@ function setup_ssh() {
     if [ "${SSH_PASSPHRASE}" == "" ]; then
         ssh-add ${SSH_PRIVATE_KEY_FILE} 2>&1 | sed -e "s|${HOME}|~|g"
     else
-        yellow "It will prompt for SSH passphrase, but it is for the script. DO NOT ENTER PASSWORD!"
+        print_yellow "It will prompt for SSH passphrase, but it is for the script. DO NOT ENTER PASSWORD!"
         expect -c "
             spawn ssh-add ${SSH_PRIVATE_KEY_FILE}
             expect \"Enter passphrase for ${SSH_PRIVATE_KEY_FILE}:\"
@@ -87,14 +75,14 @@ function setup_ssh() {
         " | sed -e "s|${HOME}|~|g"
     fi
 
-    blue "SSH setup successfully"
+    print_blue "SSH setup successfully"
 }
 
 function setup_gpg() {
     # Add GPG Private Key
     gpg --batch --yes --pinentry-mode loopback --passphrase ${GPG_PASSPHRASE} --import ${GPG_PRIVATE_KEY_FILE}
 
-    blue "GPG setup successfully"
+    print_blue "GPG setup successfully"
 }
 
 function setup_git() {
@@ -114,13 +102,14 @@ function setup_git() {
     git config --global commit.template "${HOME}/.git/commit-msg"
     git config --global user.configname "${CONFIG_FILE}"
 
-    blue "Git setup successfully"
+    print_blue "Git setup successfully"
 }
 
 # Set shell options
 set -e
 
 # Main flow
+source common.sh
 load_configs
 check_variables
 clean_up
