@@ -6,6 +6,16 @@ Scripts for switching git config in local Linux environment. (Only tested on Ubu
 2. The script [setup-gitconfig.sh](setup-gitconfig.sh) should be in the same directory.
 3. The git config env files per each profile should be in the same directory. This will be discussed in usage section below.
 
+## Warning :warning:
+Backup files in the following files/directories:
+
+- `~/.gitconfig`
+- `~/.git/commit-msg`
+- `~/.ssh/id_*`
+- `~/.gnupg/`
+
+> :warning: In the current setup, the script(s) removes those files straightaway before setting up the git config (and associated ssh and gpg setup).
+
 ## Usage
 1. Add your git configs of a profile in the current directory with 
     - naming `*.gitconfig.env`, eg.,
