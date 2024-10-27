@@ -94,7 +94,7 @@ function setup_git() {
 
     # Add git configs
     git config --global core.editor "code --wait"
-    git config --global user.name ${GIT_USER}
+    git config --global user.name "${GIT_USER}"
     git config --global user.email ${GIT_EMAIL}
     git config --global init.defaultBranch ${GIT_DEFAULT_BRANCH}
     git config --global commit.gpgsign true
